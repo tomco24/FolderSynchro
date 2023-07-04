@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FolderSynchro": {
+      "commandName": "Project",
+      "commandLineArgs": "3 42"
+    }
+  }
+}
