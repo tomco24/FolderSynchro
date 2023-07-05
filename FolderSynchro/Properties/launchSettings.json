@@ -2,7 +2,7 @@
   "profiles": {
     "FolderSynchro": {
       "commandName": "Project",
-      "commandLineArgs": "3 42"
+      "commandLineArgs": "./data/source ./data/replica 2 ./app.log"
     }
   }
 }
