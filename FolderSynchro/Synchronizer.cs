@@ -15,18 +15,21 @@ namespace FolderSynchro
             _source = manager;
             _replica = replica;
         }
-        public void InitSynchronize()
+        public void Synchronize()
         {
-            _source.InitFileList();
-            List<FileMessage> messages = _source.GetFolderChanges(_replica.GetFileList());
+            //todo must fill init file list
+
+            List<FileOperation> operations = _source.GetFolderChanges(_source.GetFileList());
+            Execute(operations);
 
         }
 
-        public void Execute(List<FileMessage> messages)
+        public void Execute(List<FileOperation> operations)
         {
-            foreach (FileMessage message in messages)
+            foreach (FileOperation operation in operations)
             {
-
+                operation.ExecuteAction(_replica);
+                // add logging
             }
         }
     }
