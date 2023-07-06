@@ -24,8 +24,12 @@ internal class Program
         int interval = int.Parse(args[2]);
         string logPath = args[3];
         FolderManagerFactory factory = new FolderManagerFactory();
-        FolderManager source = factory.GetFolderManager(sourcePath, FolderType.Source);
+        FolderManager source = new FolderManager(sourcePath);
+        FolderManager replica = new FolderManager(replicaPath);
+
         source.InitFileList();
+        source.InitManagers();
+        Console.WriteLine(Path.GetRelativePath(source.FolderPath, source.Managers[0].FolderPath));
         while (true)
         {
             try
