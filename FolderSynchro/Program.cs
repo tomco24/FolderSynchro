@@ -1,14 +1,18 @@
 ﻿using FolderSynchro;
-using FolderSynchro.enums;
+using NLog;
 
 internal class Program
 
 
 {
-    private void Synchronize(FolderManager source, FolderManager replica)
+    private static void SetupLog(string logPath)
     {
-        //todo: add log 
 
+        NLog.LogManager.Setup().LoadConfiguration(builder =>
+        {
+            builder.ForLogger().FilterMinLevel(LogLevel.Info).WriteToConsole();
+            builder.ForLogger().FilterMinLevel(LogLevel.Info).WriteToFile(fileName: logPath);
+        });
 
     }
     private static void Main(string[] args)
@@ -23,19 +27,20 @@ internal class Program
         string replicaPath = args[1];
         int interval = int.Parse(args[2]);
         string logPath = args[3];
+        SetupLog(logPath);
         FolderManagerFactory factory = new FolderManagerFactory();
         FolderManager source = new FolderManager(sourcePath);
         FolderManager replica = new FolderManager(replicaPath);
-
+        Synchronizer synchronizer = new Synchronizer(source, replica, logPath);
+        synchronizer.Equalize();
         source.InitFileList();
-        source.InitManagers();
-        Console.WriteLine(Path.GetRelativePath(source.FolderPath, source.Managers[0].FolderPath));
         while (true)
         {
             try
             {
                 Thread.Sleep(interval);
                 Console.WriteLine("End");
+                synchronizer.Synchronize();
 
             }
             catch { }

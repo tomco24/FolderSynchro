@@ -1,12 +1,4 @@
-﻿using FolderSynchro.enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FolderSynchro
+﻿namespace FolderSynchro
 {
     internal class FolderManagerFactory
     {

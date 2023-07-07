@@ -1,9 +1,4 @@
 ﻿using FolderSynchro.enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FolderSynchro
 {
@@ -12,9 +7,10 @@ namespace FolderSynchro
         public string FolderPath { get; }
         public string FolderName { get; }
         internal List<FolderManager> Managers { get => _managers; set => _managers = value; }
+
         internal FolderManager? Parent { get; }
         private List<FolderManager> _managers = new List<FolderManager>();
-        private Dictionary<string, DateTime> _fileList = new Dictionary<string, DateTime>();
+        private Dictionary<string, FileInfo> _fileList = new Dictionary<string, FileInfo>();
         public FolderManager(string path)
         {
             // TODO check path
@@ -42,42 +38,56 @@ namespace FolderSynchro
             FolderName = folderName;
             FolderPath = Path.Combine(Parent.FolderPath, folderName);
         }
-        
-        public List<string> GetFileList() 
+
+        public List<FileInfo> GetFileInfoList()
         {
-            return Directory.GetFiles(FolderPath, "*", SearchOption.TopDirectoryOnly)
-                .Select(f => Path.GetFileName(f)).ToList();
+            return Directory.GetFiles(FolderPath, "*", SearchOption.AllDirectories)
+                .Select(f => FileInfo.CreateInstance(f)).ToList();
         }
-        public void InitFileList() {
-            _fileList = GetFileList().ToDictionary(x => x, x => File.GetLastWriteTime(x));
-            
+        public List<String> GetFileList()
+        {
+            return Directory.GetFiles(FolderPath, "*", SearchOption.AllDirectories).ToList();
+        }
+        public List<string> GetFolderList()
+        {
+            return Directory.GetDirectories(FolderPath, "*", SearchOption.AllDirectories).ToList();
+        }
+        public void InitFileList()
+        {
+            _fileList = GetFileInfoList().ToDictionary(f => f.FilePath, f => f);
+
         }
         public void InitManagers()
         {
-            List<string> folderList = Directory.GetDirectories(FolderPath,"*",SearchOption.TopDirectoryOnly).ToList();
+            List<string> folderList = Directory.GetDirectories(FolderPath, "*", SearchOption.TopDirectoryOnly).ToList();
             //init managers
             foreach (string folder in folderList)
             {
                 Managers.Add(new FolderManager(folder));
             }
         }
-        public List<FileOperation> GetFolderChanges(List<string> files)
+        public List<FileOperation> GetFolderChanges(List<FileInfo> files)
         {
             List<FileOperation> messages = new List<FileOperation>();
-            foreach(string file in files)
+            FileInfoComparer comparer = new FileInfoComparer();
+            foreach (FileInfo file in files)
             {
-                if (_fileList.ContainsKey(file) && File.GetLastWriteTime(file)>_fileList[file])
+                if (_fileList.ContainsKey(file.FilePath) && !comparer.Equals(file, _fileList[file.FilePath]))
                 {
-                    messages.Add(new FileOperation(GetFullFilePath(file), FileAction.Modified));       
+                    messages.Add(new FileOperation(file.FilePath, FileAction.Modified));
+                    _fileList[file.FilePath] = file;
                 }
-                if (!_fileList.ContainsKey(file))
+                if (!_fileList.ContainsKey(file.FilePath))
                 {
-                    messages.Add(new FileOperation(GetFullFilePath(file), FileAction.Created));
+                    messages.Add(new FileOperation(file.FilePath, FileAction.Created));
+                    _fileList[file.FilePath] = file;
 
                 }
             }
-            foreach(string file in _fileList.Keys.Except(files)) {
-                messages.Add(new FileOperation(GetFullFilePath(file), FileAction.Removed));
+            foreach (string file in _fileList.Keys.Except(files.Select(x => x.FilePath).ToList()))
+            {
+                messages.Add(new FileOperation(file, FileAction.Removed));
+                _fileList.Remove(file);
 
             }
             return messages;
