@@ -2,18 +2,14 @@
 
 namespace FolderSynchro
 {
-    internal class FileOperation
+    public class FileOperation
     {
-        public FileAction Action { get; set; }
-        public string FilePath { get; set; }
+        public FileAction Action { get; }
+        public string FilePath { get; }
         public FileOperation(string filename, FileAction fileAction)
         {
             FilePath = filename;
             Action = fileAction;
-        }
-        public void ExecuteAction(FolderManager manager)
-        {
-
         }
 
     }

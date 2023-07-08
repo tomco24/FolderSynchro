@@ -2,7 +2,7 @@
 
 namespace FolderSynchro
 {
-    internal class FileInfoComparer : IEqualityComparer<FileInfo>
+    public class FileInfoComparer : IEqualityComparer<FileInfo>
     {
         public bool Equals(FileInfo? x, FileInfo? y)
         {

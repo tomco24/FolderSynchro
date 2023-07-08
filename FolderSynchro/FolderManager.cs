@@ -2,13 +2,10 @@
 
 namespace FolderSynchro
 {
-    internal class FolderManager
+    public class FolderManager
     {
         public string FolderPath { get; }
-        public string FolderName { get; }
-        internal List<FolderManager> Managers { get => _managers; set => _managers = value; }
 
-        internal FolderManager? Parent { get; }
         private List<FolderManager> _managers = new List<FolderManager>();
         private Dictionary<string, FileInfo> _fileList = new Dictionary<string, FileInfo>();
         public FolderManager(string path)
@@ -16,27 +13,9 @@ namespace FolderSynchro
             // TODO check path
             if (!Directory.Exists(path))
             {
-                throw new DirectoryNotFoundException(path);
+                Directory.CreateDirectory(path);
             }
             FolderPath = path;
-            Parent = null;
-            FolderName = "";
-        }
-        public FolderManager(string path, FolderManager parent)
-        {
-            if (!Directory.Exists(path))
-            {
-                throw new DirectoryNotFoundException(path);
-            }
-            FolderPath = path;
-            Parent = parent;
-            FolderName = GetFolderName();
-        }
-        public FolderManager(FolderManager parent, string folderName)
-        {
-            Parent = parent;
-            FolderName = folderName;
-            FolderPath = Path.Combine(Parent.FolderPath, folderName);
         }
 
         public List<FileInfo> GetFileInfoList()
@@ -56,15 +35,6 @@ namespace FolderSynchro
         {
             _fileList = GetFileInfoList().ToDictionary(f => f.FilePath, f => f);
 
-        }
-        public void InitManagers()
-        {
-            List<string> folderList = Directory.GetDirectories(FolderPath, "*", SearchOption.TopDirectoryOnly).ToList();
-            //init managers
-            foreach (string folder in folderList)
-            {
-                Managers.Add(new FolderManager(folder));
-            }
         }
         public List<FileOperation> GetFolderChanges(List<FileInfo> files)
         {
@@ -96,11 +66,6 @@ namespace FolderSynchro
         public string GetFullFilePath(string fileName)
         {
             return Path.Combine(FolderPath, fileName);
-        }
-        public string GetFolderName()
-        {
-            if (Parent == null) { return ""; }
-            return Path.GetRelativePath(Parent.FolderPath, FolderPath);
         }
     }
 }

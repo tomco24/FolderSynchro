@@ -1,9 +1,8 @@
 ﻿using FolderSynchro.enums;
-using NLog.Config;
 
 namespace FolderSynchro
 {
-    internal class Synchronizer
+    public class Synchronizer
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
@@ -24,6 +23,7 @@ namespace FolderSynchro
             }
             SynchronizeFolderStructure();
             EqualizeFiles();
+            _source.InitFileList();
 
 
 
@@ -35,7 +35,8 @@ namespace FolderSynchro
             Logger.Info("Synchronization started!");
             SynchronizeFolderStructure();
             SynchronizeFiles();
-            if (_source.GetFileList().Count != _replica.GetFileList().Count) {
+            if (_source.GetFileList().Count != _replica.GetFileList().Count)
+            {
                 Equalize();
             }
             Logger.Info("Synchronization finished!");
@@ -53,8 +54,7 @@ namespace FolderSynchro
         {
             List<string> sourceFiles = _source.GetFileList();
             HashSet<string> replicaFiles = _replica.GetFileList().ToHashSet();
-            //replicaFiles = replicaFiles.Except(sourceFiles).ToList();
-         
+
             foreach (string file in sourceFiles)
             {
                 string destPath = Path.Combine(_replica.FolderPath, Path.GetRelativePath(_source.FolderPath, file));
@@ -87,58 +87,17 @@ namespace FolderSynchro
                 {
                     Directory.CreateDirectory(replicaFolder);
                     Logger.Info("New folder {} was created in the source folder",
-                        Path.GetRelativePath(_replica.FolderPath,replicaFolder));
+                        Path.GetRelativePath(_replica.FolderPath, replicaFolder));
                 }
             }
         }
 
-        private void SynchronizeSubFolders(FolderManager source, FolderManager replica)
-        {
-            bool match = false;
-            FolderManagerComparer comparer = new FolderManagerComparer();
-            //List<FolderManager> inBoth = source.Managers.Intersect(replica.Managers,comparer).ToList();
-            //List<FolderManager> inSource = source.Managers.Except(replica.Managers,comparer).ToList();
-            List<FolderManager> inReplica = replica.Managers.Except(source.Managers, comparer).ToList();
 
-            foreach (FolderManager manager in source.Managers)
-            {
-                foreach (FolderManager replicaManager in replica.Managers)
-                {
-                    if (comparer.Equals(manager, replicaManager))
-                    {
-                        SynchronizeManagers(manager, replicaManager);
-                        match = true;
-                        break;
-                    }
-                }
-                if (match)
-                {
-                    FolderManager createdManager = CreateFolder(manager, replica);
-                    SynchronizeManagers(manager, createdManager);
-                    match = false;
-                }
-            }
-
-        }
-
-        private void SynchronizeManagers(FolderManager source, FolderManager replica)
-        {
-            List<FileOperation> operations = _replica.GetFolderChanges(_source.GetFileInfoList());
-            Execute(operations);
-            if (source.Managers.Count > 0 || replica.Managers.Count > 0)
-            {
-                SynchronizeSubFolders(source, replica);
-            }
-
-        }
-
-        public void Execute(List<FileOperation> operations)
+        private void Execute(List<FileOperation> operations)
         {
             foreach (FileOperation operation in operations)
             {
                 ExecuteOperation(operation);
-                // add logging
-
             }
         }
 
@@ -152,7 +111,6 @@ namespace FolderSynchro
             {
                 File.Copy(operation.FilePath, destPath, true);
                 Logger.Info("{0} was {1}. Copying from the source folder to the replica folder", operation.FilePath, actionString);
-
             }
             else
             {
@@ -163,14 +121,6 @@ namespace FolderSynchro
 
                 }
             }
-        }
-
-        public FolderManager CreateFolder(FolderManager source, FolderManager replica)
-        {
-            FolderManager createdManager = new FolderManager(replica, source.FolderName);
-            replica.Managers.Add(createdManager);
-            Directory.CreateDirectory(createdManager.FolderPath);
-            return createdManager;
         }
 
         private void DeleteFolders(List<string> folders)

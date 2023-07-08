@@ -1,6 +1,9 @@
 ﻿namespace FolderSynchro
 {
-    internal class FileInfo
+
+
+
+    public class FileInfo
     {
         public string FilePath { get; }
         public FileAttributes Attributes { get; }

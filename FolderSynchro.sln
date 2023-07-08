@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolderSynchro", "FolderSynchro\FolderSynchro.csproj", "{7B175B31-F0F9-49E8-B256-DDCCF8787313}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolderSynchro", "FolderSynchro\FolderSynchro.csproj", "{7B175B31-F0F9-49E8-B256-DDCCF8787313}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolderSynchroTests", "FolderSynchroTests\FolderSynchroTests.csproj", "{D845900F-94B9-4615-8E2E-53C167F26EFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{7B175B31-F0F9-49E8-B256-DDCCF8787313}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B175B31-F0F9-49E8-B256-DDCCF8787313}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B175B31-F0F9-49E8-B256-DDCCF8787313}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D845900F-94B9-4615-8E2E-53C167F26EFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D845900F-94B9-4615-8E2E-53C167F26EFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D845900F-94B9-4615-8E2E-53C167F26EFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D845900F-94B9-4615-8E2E-53C167F26EFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
